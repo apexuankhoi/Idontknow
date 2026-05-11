@@ -522,8 +522,7 @@
             </div>
         </header>
 
-        <section class="grid">
-            <article class="card fade-in">
+        <section class="card fade-in" style="margin-top: 22px;">
                 <h3>Trực quan nhanh</h3>
                 <p>Mỗi vòng lặp, phần đã sắp xếp ở bên trái được giữ nguyên, phần chưa sắp xếp ở bên phải được quét toàn
                     bộ để tìm min.</p>
@@ -563,31 +562,42 @@
 }</pre>
 
                 </pre>
-            </article>
+        </section>
 
-            <article class="card interactive fade-in">
-                <h3>Thực hành ngay</h3>
-                <label for="inputArray">Nhập các số (cách nhau bởi dấu phẩy, chấm phẩy, hoặc khoảng trắng):</label>
-                <input type="text" id="inputArray" value="29, 10, 14, 37, 13" placeholder="Ví dụ: 29, 10, 14, 37, 13">
-                <div class="btn-row">
-                    <button class="primary" type="button" onclick="runSelectionSort()">Sắp xếp tăng dần</button>
-                    <button class="ghost" type="button" onclick="generateRandomArray()">Tạo mảng ngẫu nhiên</button>
-                </div>
-                <div class="btn-row step-row">
-                    <button class="secondary" type="button" onclick="stepSelectionSort()">Bước tiếp theo</button>
-                    <button class="warn" type="button" onclick="autoSelectionSort()">Chạy tự động</button>
-                    <button class="ghost" type="button" onclick="stopAutoSort()">Dừng</button>
-                    <button class="ghost" type="button" onclick="resetStepSort()">Đặt lại</button>
-                </div>
-                <div class="array-view" id="arrayView"></div>
-                <div class="legend">
-                    <span><i class="sorted"></i> Đã sắp xếp</span>
-                    <span><i class="current"></i> Vị trí đang duyệt</span>
-                    <span><i class="min"></i> Min sau bước</span>
-                </div>
-                <div id="stepStatus" class="step-status">Sẵn sàng. Nhấn "Bước tiếp theo" để bắt đầu.</div>
-                <div id="result" class="output-box">Bấm nút để xem kết quả chi tiết từng bước...</div>
-            </article>
+        <!-- VÍ DỤ MINH HỌA -->
+        <section class="card fade-in" style="margin-top: 22px;">
+            <h3>Ví dụ minh họa (Dry Run)</h3>
+            <p>Giả sử ta cần sắp xếp dãy số: <code>[ 29, 10, 14, 37, 13 ]</code></p>
+            <ul style="margin-top: 16px; margin-bottom: 12px; list-style-type: none; padding-left: 0;">
+                <li style="margin-bottom: 24px;">
+                    <strong>Bước 1:</strong> Tìm số nhỏ nhất từ vị trí 0 đến 4. Số nhỏ nhất là <strong>10</strong> (ở vị trí 1). Hoán đổi 10 và 29.
+                    <div class="array-view" style="margin-top: 10px;">
+                        <span class="chip sorted">10</span> <span class="chip">29</span> <span class="chip">14</span> <span class="chip">37</span> <span class="chip">13</span>
+                    </div>
+                </li>
+                
+                <li style="margin-bottom: 24px;">
+                    <strong>Bước 2:</strong> Tìm số nhỏ nhất từ vị trí 1 đến 4. Số nhỏ nhất là <strong>13</strong> (ở vị trí 4). Hoán đổi 13 và 29.
+                    <div class="array-view" style="margin-top: 10px;">
+                        <span class="chip sorted">10</span> <span class="chip sorted">13</span> <span class="chip">14</span> <span class="chip">37</span> <span class="chip">29</span>
+                    </div>
+                </li>
+
+                <li style="margin-bottom: 24px;">
+                    <strong>Bước 3:</strong> Tìm số nhỏ nhất từ vị trí 2 đến 4. Số nhỏ nhất là <strong>14</strong> (ở vị trí 2). 14 đang ở đúng vị trí nên không cần hoán đổi.
+                    <div class="array-view" style="margin-top: 10px;">
+                        <span class="chip sorted">10</span> <span class="chip sorted">13</span> <span class="chip sorted">14</span> <span class="chip">37</span> <span class="chip">29</span>
+                    </div>
+                </li>
+
+                <li style="margin-bottom: 24px;">
+                    <strong>Bước 4:</strong> Tìm số nhỏ nhất từ vị trí 3 đến 4. Số nhỏ nhất là <strong>29</strong> (ở vị trí 4). Hoán đổi 29 và 37.
+                    <div class="array-view" style="margin-top: 10px;">
+                        <span class="chip sorted">10</span> <span class="chip sorted">13</span> <span class="chip sorted">14</span> <span class="chip sorted">29</span> <span class="chip">37</span>
+                    </div>
+                </li>
+            </ul>
+            <p>Đến đây, phần chưa sắp xếp chỉ còn 1 phần tử (37), nên ta có thể dừng thuật toán. Dãy đã được sắp xếp hoàn tất!</p>
         </section>
 
         <section class="card fade-in" style="margin-top: 22px;">
@@ -637,6 +647,32 @@
                 <li>Số lần hoán đổi tối đa bằng n - 1, nhưng số lần so sánh là rất nhiều.</li>
                 <li>Thích hợp cho demo thuật toán và mảng kích thước nhỏ.</li>
             </ul>
+        </section>
+
+        <!-- BẢN DEMO THUẬT TOÁN (CHUYỂN XUỐNG CUỐI CÙNG) -->
+        <section class="card interactive fade-in" style="margin-top: 40px; border: 2px solid var(--accent-2); box-shadow: 0 15px 35px rgba(43, 111, 106, 0.15);">
+            <h3 style="color: var(--accent-2); font-size: 24px; margin-bottom: 12px;">Phòng thí nghiệm: Chạy thử thuật toán</h3>
+            <p style="margin-bottom: 20px; color: var(--muted);">Bây giờ bạn đã hiểu toàn bộ logic, ưu/nhược điểm. Hãy tự mình thử nghiệm bằng bảng điều khiển bên dưới!</p>
+            <label for="inputArray" style="display: block; font-weight: 600; margin-bottom: 8px;">Nhập các số (cách nhau bởi dấu phẩy, chấm phẩy, khoảng trắng):</label>
+            <input type="text" id="inputArray" value="29, 10, 14, 37, 13" placeholder="Ví dụ: 29, 10, 14, 37, 13">
+            <div class="btn-row" style="margin-top: 16px;">
+                <button class="primary" type="button" onclick="runSelectionSort()">Sắp xếp nhanh</button>
+                <button class="ghost" type="button" onclick="generateRandomArray()">Tạo mảng ngẫu nhiên</button>
+            </div>
+            <div class="btn-row step-row" style="margin-top: 12px;">
+                <button class="secondary" type="button" onclick="stepSelectionSort()">Chạy từng bước</button>
+                <button class="warn" type="button" onclick="autoSelectionSort()">Chạy tự động</button>
+                <button class="ghost" type="button" onclick="stopAutoSort()">Dừng</button>
+                <button class="ghost" type="button" onclick="resetStepSort()">Đặt lại</button>
+            </div>
+            <div class="array-view" id="arrayView" style="margin-top: 24px; padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px; min-height: 80px; align-items: center;"></div>
+            <div class="legend" style="margin-top: 16px; justify-content: center;">
+                <span><i class="sorted"></i> Đã sắp xếp</span>
+                <span><i class="current"></i> Vị trí đang duyệt</span>
+                <span><i class="min"></i> Min sau bước</span>
+            </div>
+            <div id="stepStatus" class="step-status" style="text-align: center; font-weight: 600; margin-top: 12px; font-size: 14px;">Sẵn sàng. Nhấn "Chạy từng bước" hoặc "Chạy tự động" để bắt đầu.</div>
+            <div id="result" class="output-box">Bấm nút để xem kết quả chi tiết (log) từng bước...</div>
         </section>
     </main>
 
