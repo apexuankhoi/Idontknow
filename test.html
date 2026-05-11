@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selection Sort - Trực quan và giải thích</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+        :root {
+            --bg: #f6f1ea;
+            --ink: #191c23;
+            --muted: #5e6271;
+            --accent: #f46a4e;
+            --accent-2: #2b6f6a;
+            --accent-3: #f3b23c;
+            --card: #ffffff;
+            --shadow: 0 22px 50px rgba(23, 25, 39, 0.14);
+            --soft-shadow: 0 10px 25px rgba(23, 25, 39, 0.08);
+            --code-bg: #0f1117;
+            --code-ink: #f0f0f5;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Space Grotesk", sans-serif;
+            color: var(--ink);
+            background: linear-gradient(140deg, #f8efe3 0%, #f2f7f4 45%, #f6f1ea 100%);
+            min-height: 100vh;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            filter: blur(0px);
+            opacity: 0.28;
+            z-index: 0;
+        }
+
+        body::before {
+            top: -120px;
+            right: -120px;
+            background: radial-gradient(circle at center, #f46a4e, transparent 70%);
+        }
+
+        body::after {
+            bottom: -140px;
+            left: -120px;
+            background: radial-gradient(circle at center, #2b6f6a, transparent 70%);
+        }
+
+        main.page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 48px 20px 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 28px;
+            align-items: center;
+        }
+
+        .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 0.28em;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-2);
+        }
+
+        h1 {
+            font-family: "Fraunces", serif;
+            font-size: clamp(32px, 4vw, 52px);
+            margin: 12px 0;
+        }
+
+        p {
+            margin: 0 0 12px;
+            line-height: 1.7;
+            color: var(--muted);
+        }
+
+        .lead {
+            font-size: 18px;
+        }
+
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .tag {
+            border: 1px solid rgba(244, 106, 78, 0.4);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            background: rgba(244, 106, 78, 0.08);
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 22px 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(25, 28, 35, 0.08);
+        }
+
+        .hero-card h3 {
+            margin-top: 0;
+            font-family: "Fraunces", serif;
+            font-size: 22px;
+            color: var(--ink);
+        }
+
+        .hero-card ol {
+            padding-left: 18px;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .quote {
+            margin-top: 16px;
+            padding: 14px 16px;
+            background: rgba(43, 111, 106, 0.08);
+            border-left: 4px solid var(--accent-2);
+            font-weight: 600;
+            color: #1d4946;
+            border-radius: 12px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+            margin-top: 32px;
+        }
+
+        .card h3 {
+            margin: 0 0 12px;
+            font-size: 20px;
+            color: var(--ink);
+        }
+
+        h4 {
+            margin: 18px 0 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--accent-2);
+        }
+
+        ul {
+            padding-left: 18px;
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .diagram {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 14px 0;
+        }
+
+        .diagram .block {
+            padding: 14px;
+            border-radius: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .diagram .sorted {
+            background: rgba(43, 111, 106, 0.15);
+            color: #1d4946;
+            border: 1px dashed rgba(43, 111, 106, 0.4);
+        }
+
+        .diagram .unsorted {
+            background: rgba(244, 106, 78, 0.15);
+            color: #8c2f1d;
+            border: 1px dashed rgba(244, 106, 78, 0.4);
+        }
+
+        .info-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .pill {
+            background: #f2f0eb;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #3d414c;
+            border: 1px solid rgba(25, 28, 35, 0.08);
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            /* VS Code dark style */
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 16px;
+            font-family: 'Fira Code', 'Cascadia Code', Consolas, monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            overflow: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .code-block span {
+            font-style: normal !important;
+        }
+
+        .interactive label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(25, 28, 35, 0.2);
+            font-size: 16px;
+            background: #ffffff;
+        }
+
+        input:focus-visible,
+        button:focus-visible {
+            outline: 3px solid rgba(244, 106, 78, 0.35);
+            outline-offset: 2px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .step-row {
+            margin-top: 8px;
+        }
+
+        button {
+            border: none;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .primary {
+            background: linear-gradient(135deg, #f46a4e, #f3b23c);
+            color: #1b1d24;
+            box-shadow: 0 12px 24px rgba(244, 106, 78, 0.28);
+        }
+
+        .secondary {
+            background: linear-gradient(135deg, #2b6f6a, #58b1a8);
+            color: #f4fffd;
+            box-shadow: 0 12px 22px rgba(43, 111, 106, 0.28);
+        }
+
+        .warn {
+            background: linear-gradient(135deg, #f3b23c, #f6c96f);
+            color: #2b1b00;
+            box-shadow: 0 12px 22px rgba(243, 178, 60, 0.28);
+        }
+
+        .ghost {
+            background: #ffffff;
+            border: 1px solid rgba(25, 28, 35, 0.2);
+            color: #1b1d24;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .array-view {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .chip {
+            padding: 8px 14px;
+            border-radius: 12px;
+            background: #ffffff;
+            font-weight: 700;
+            border: 2px solid rgba(25, 28, 35, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 45px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .chip:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .chip.sorted {
+            background: rgba(43, 111, 106, 0.18);
+            color: #1d4946;
+            border-color: rgba(43, 111, 106, 0.3);
+        }
+
+        .chip.current {
+            background: rgba(243, 178, 60, 0.25);
+            color: #5c3a00;
+            border-color: rgba(243, 178, 60, 0.45);
+        }
+
+        .chip.min {
+            background: rgba(244, 106, 78, 0.2);
+            color: #8c2f1d;
+            border-color: rgba(244, 106, 78, 0.45);
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .step-status {
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .legend span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend i {
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .legend i.sorted {
+            background: rgba(43, 111, 106, 0.6);
+        }
+
+        .legend i.current {
+            background: rgba(243, 178, 60, 0.6);
+        }
+
+        .legend i.min {
+            background: rgba(244, 106, 78, 0.6);
+        }
+
+        .output-box {
+            margin-top: 18px;
+            padding: 16px;
+            background: #10131a;
+            color: #f5f3ff;
+            border-radius: 14px;
+            min-height: 180px;
+            line-height: 1.6;
+            font-family: "Courier New", monospace;
+        }
+
+        .output-box .chip {
+            background: #1c222f;
+            color: #f5f3ff;
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .output-box .chip.sorted {
+            background: rgba(43, 111, 106, 0.35);
+            color: #c8f5ee;
+        }
+
+        .output-box .chip.current {
+            background: rgba(243, 178, 60, 0.35);
+            color: #ffe2a8;
+        }
+
+        .output-box .chip.min {
+            background: rgba(244, 106, 78, 0.35);
+            color: #ffd0c2;
+        }
+
+        .log-step {
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border-left: 4px solid rgba(243, 178, 60, 0.7);
+        }
+
+        .log-title {
+            font-weight: 700;
+            color: #f3b23c;
+            margin-bottom: 6px;
+        }
+
+        .log-min {
+            color: #f46a4e;
+            font-weight: 700;
+        }
+
+        .log-ok {
+            color: #8ddc94;
+            font-weight: 700;
+        }
+
+        .log-array {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .highlight {
+            color: #8ddc94;
+            font-weight: 700;
+        }
+
+        .fade-in {
+            animation: rise 0.6s ease both;
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .diagram {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-row {
+                flex-direction: column;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <header class="hero fade-in">
+            <div>
+                <div class="eyebrow">Giải thuật</div>
+                <h1>Selection Sort: Chọn min, đưa lên đầu hàng</h1>
+                <p class="lead">Selection Sort tương tự Insertion Sort, nhưng thay vì chèn từng phần tử, ta luôn đi tìm
+                    phần tử nhỏ nhất trong phần chưa sắp xếp để đưa về đầu.</p>
+                <p>Phù hợp cho việc học thuật toán cơ bản vì cách hoạt động cực kỳ trực quan: quét, chọn min, đổi chỗ,
+                    mở rộng vùng đã sắp xếp.</p>
+                <div class="tag-row">
+                    <span class="tag">Đơn giản - dễ hiểu</span>
+                    <span class="tag">Dễ hình dung</span>
+                    <span class="tag">Tính toán O(n^2)</span>
+                </div>
+            </div>
+            <div class="card hero-card">
+                <h3>Ý tưởng thuật toán - giải thích chi tiết</h3>
+                <ol>
+                    <li>Tưởng tượng mảng được chia làm 2 phần: đã sắp xếp (ở đầu) và chưa sắp xếp (ở cuối).</li>
+                    <li>Mỗi bước, thuật toán quét toàn bộ phần chưa sắp xếp để tìm phần tử nhỏ nhất.</li>
+                    <li>Hoán đổi phần tử nhỏ nhất đó với phần tử đầu tiên của phần chưa sắp xếp.</li>
+                    <li>Ranh giới phần đã sắp xếp được mở rộng thêm một ô về bên phải.</li>
+                    <li>Lặp lại cho đến khi phần chưa sắp xếp chỉ còn 1 phần tử.</li>
+                </ol>
+                <div class="quote">"Đi tìm thằng nhỏ nhất trong đám lộn xộn, rồi ném nó lên đầu hàng."</div>
+            </div>
+        </header>
+
+        <section class="grid">
+            <article class="card fade-in">
+                <h3>Trực quan nhanh</h3>
+                <p>Mỗi vòng lặp, phần đã sắp xếp ở bên trái được giữ nguyên, phần chưa sắp xếp ở bên phải được quét toàn
+                    bộ để tìm min.</p>
+                <div class="diagram">
+                    <div class="block sorted">Đã sắp xếp</div>
+                    <div class="block unsorted">Chưa sắp xếp</div>
+                </div>
+                <p>Vì mỗi bước đều cần quét toàn bộ phần chưa sắp xếp, Selection Sort có độ phức tạp O(n^2) và không phù
+                    hợp cho mảng lớn.</p>
+                <div class="info-row">
+                    <span class="pill">Thời gian: O(n^2)</span>
+                    <span class="pill">Bộ nhớ: O(1)</span>
+                    <span class="pill">Hoán đổi tại chỗ</span>
+                </div>
+                <h4>Code C++ mẫu</h4>
+                <pre class="code-block">
+<span style="color: #6a9955">// Thuật toán Selection Sort trong C++</span>
+<span style="color: #569cd6">void</span> <span style="color: #dcdcaa">selectionSort</span>(<span style="color: #569cd6">int</span> arr[], <span style="color: #569cd6">int</span> n) {
+    <span style="color: #c586c0">for</span> (<span style="color: #569cd6">int</span> i = <span style="color: #b5cea8">0</span>; i < n - <span style="color: #b5cea8">1</span>; i++) {
+        <span style="color: #6a9955">// Giả sử phần tử nhỏ nhất ở vị trí i</span>
+        <span style="color: #569cd6">int</span> minIdx = i;
+        
+        <span style="color: #6a9955">// Tìm phần tử nhỏ nhất trong phần chưa sắp xếp</span>
+        <span style="color: #c586c0">for</span> (<span style="color: #569cd6">int</span> j = i + <span style="color: #b5cea8">1</span>; j < n; j++) {
+            <span style="color: #c586c0">if</span> (arr[j] < arr[minIdx]) {
+                minIdx = j;
+            }
+        }
+
+        <span style="color: #6a9955">// Hoán đổi nếu tìm thấy phần tử nhỏ hơn</span>
+        <span style="color: #c586c0">if</span> (minIdx != i) {
+            <span style="color: #569cd6">int</span> temp = arr[i];
+            arr[i] = arr[minIdx];
+            arr[minIdx] = temp;
+        }
+    }
+}</pre>
+
+                </pre>
+            </article>
+
+            <article class="card interactive fade-in">
+                <h3>Thực hành ngay</h3>
+                <label for="inputArray">Nhập các số (cách nhau bởi dấu phẩy, chấm phẩy, hoặc khoảng trắng):</label>
+                <input type="text" id="inputArray" value="29, 10, 14, 37, 13" placeholder="Ví dụ: 29, 10, 14, 37, 13">
+                <div class="btn-row">
+                    <button class="primary" type="button" onclick="runSelectionSort()">Sắp xếp tăng dần</button>
+                    <button class="ghost" type="button" onclick="generateRandomArray()">Tạo mảng ngẫu nhiên</button>
+                </div>
+                <div class="btn-row step-row">
+                    <button class="secondary" type="button" onclick="stepSelectionSort()">Bước tiếp theo</button>
+                    <button class="warn" type="button" onclick="autoSelectionSort()">Chạy tự động</button>
+                    <button class="ghost" type="button" onclick="stopAutoSort()">Dừng</button>
+                    <button class="ghost" type="button" onclick="resetStepSort()">Đặt lại</button>
+                </div>
+                <div class="array-view" id="arrayView"></div>
+                <div class="legend">
+                    <span><i class="sorted"></i> Đã sắp xếp</span>
+                    <span><i class="current"></i> Vị trí đang duyệt</span>
+                    <span><i class="min"></i> Min sau bước</span>
+                </div>
+                <div id="stepStatus" class="step-status">Sẵn sàng. Nhấn "Bước tiếp theo" để bắt đầu.</div>
+                <div id="result" class="output-box">Bấm nút để xem kết quả chi tiết từng bước...</div>
+            </article>
+        </section>
+
+        <section class="card fade-in" style="margin-top: 22px;">
+            <h3>1. Phân tích Độ phức tạp (Complexity)</h3>
+            <p>Điểm đặc trưng nhất của Selection Sort là nó rất kiên định (hoặc có thể nói là "máy móc"). Dù mảng đã
+                được sắp xếp sẵn hay đang lộn xộn, nó vẫn phải đi quét toàn bộ phần chưa sắp xếp để chắc chắn đó là phần
+                tử nhỏ nhất.</p>
+
+            <h4>Độ phức tạp thời gian (Time Complexity):</h4>
+            <ul>
+                <li><strong>Trường hợp tốt nhất</strong> (Mảng đã sắp xếp): O(n<sup>2</sup>)</li>
+                <li><strong>Trường hợp trung bình</strong>: O(n<sup>2</sup>)</li>
+                <li><strong>Trường hợp xấu nhất</strong> (Mảng sắp xếp ngược): O(n<sup>2</sup>)</li>
+            </ul>
+            <p><strong>Giải thích:</strong> Ở vòng lặp đầu tiên, nó so sánh <code>n-1</code> lần. Vòng 2 là
+                <code>n-2</code> lần... Tổng số phép so sánh luôn là <code>(n-1) + (n-2) + ... + 1 = n(n-1)/2</code>,
+                tức là tiệm cận <strong>O(n<sup>2</sup>)</strong>.</p>
+
+            <h4>Độ phức tạp không gian (Space Complexity): O(1)</h4>
+            <p><strong>Giải thích:</strong> Nó là thuật toán sắp xếp tại chỗ (in-place), chỉ cần dùng 1-2 biến phụ để
+                lưu giá trị tạm thời khi hoán đổi (swap), không cần tạo thêm mảng mới.</p>
+        </section>
+
+        <section class="card fade-in" style="margin-top: 22px;">
+            <h3>2. Ưu điểm "Bí mật" của Selection Sort</h3>
+            <p>Dù bị chê là chậm với <strong>O(n<sup>2</sup>)</strong>, Selection Sort lại sở hữu một "siêu năng lực" mà ít thuật toán cơ bản nào có được: <strong>Số lần hoán đổi (Swap / Write) cực kỳ ít</strong>.</p>
+            <p>Ở mỗi bước, nó chỉ thực hiện tối đa 1 lần hoán đổi. Tổng số lần hoán đổi trong toàn bộ thuật toán tối đa là <strong>O(n)</strong>.</p>
+            <div class="quote"><strong>Ứng dụng thực tế:</strong> Nếu bạn đang làm việc trên một hệ thống mà chi phí để ghi dữ liệu vào bộ nhớ (write) đắt hơn rất nhiều so với chi phí đọc (read) (ví dụ: ổ cứng Flash đời cũ, bộ nhớ EEPROM), Selection Sort có thể là một lựa chọn tối ưu hơn cả Insertion Sort hay Bubble Sort vì nó giảm thiểu tối đa sự hao mòn do ghi đè dữ liệu.</div>
+        </section>
+
+        <section class="card fade-in" style="margin-top: 22px;">
+            <h3>3. Selection Sort KHÔNG phải là thuật toán Ổn định (Not Stable)</h3>
+            <p>Một thuật toán sắp xếp được gọi là <strong>ổn định (Stable)</strong> nếu nó giữ nguyên thứ tự ban đầu của các phần tử có giá trị bằng nhau. Selection Sort không làm được điều này.</p>
+            <h4>Ví dụ chứng minh:</h4>
+            <p>Giả sử ta có mảng: <code>[ 4a, 4b, 2 ]</code> (trong đó 4a và 4b đều có giá trị là 4, nhưng 4a đứng trước).</p>
+            <ul style="margin-bottom: 12px;">
+                <li><strong>Bước 1:</strong> Tìm số nhỏ nhất là 2. Thuật toán sẽ hoán đổi 2 với phần tử đầu tiên là 4a.</li>
+                <li><strong>Mảng trở thành:</strong> <code>[ 2, 4b, 4a ]</code></li>
+            </ul>
+            <p>Bạn thấy không? Thứ tự của <strong>4a</strong> và <strong>4b</strong> đã bị đảo ngược so với ban đầu. Điều này có thể gây lỗi nếu bạn đang sắp xếp dữ liệu phức tạp (ví dụ: sắp xếp học sinh theo điểm, nếu điểm bằng nhau thì phải giữ nguyên thứ tự abc của tên như danh sách cũ).</p>
+        </section>
+
+        <section class="card fade-in" style="margin-top: 22px;">
+            <h3>Chốt nhanh</h3>
+            <ul>
+                <li>Selection Sort mỗi vòng lặp chọn ra 1 phần tử nhỏ nhất để đặt đúng vị trí.</li>
+                <li>Số lần hoán đổi tối đa bằng n - 1, nhưng số lần so sánh là rất nhiều.</li>
+                <li>Thích hợp cho demo thuật toán và mảng kích thước nhỏ.</li>
+            </ul>
+        </section>
+    </main>
+
+    <script>
+        const inputEl = document.getElementById("inputArray");
+        const outputDiv = document.getElementById("result");
+        const arrayView = document.getElementById("arrayView");
+        const stepStatus = document.getElementById("stepStatus");
+
+        let stepState = null;
+        let autoTimer = null;
+
+        function parseInput() {
+            return inputEl.value
+                .split(/[,;\s]+/)
+                .map((item) => Number(item))
+                .filter((item) => Number.isFinite(item));
+        }
+
+        function formatArray(arr, options = {}) {
+            const { sortedUntil = -1, currentIndex = -1, minIndex = -1 } = options;
+            return arr
+                .map((value, index) => {
+                    const classes = ["chip"];
+                    if (index <= sortedUntil) classes.push("sorted");
+                    if (index === currentIndex) classes.push("current");
+                    if (index === minIndex) classes.push("min");
+                    return `<span class="${classes.join(" ")}">${value}</span>`;
+                })
+                .join("");
+        }
+
+        function updatePreview() {
+            const arr = parseInput();
+            if (arr.length === 0) {
+                arrayView.innerHTML = `<span class="chip">Chưa có dữ liệu</span>`;
+                return;
+            }
+            arrayView.innerHTML = formatArray(arr);
+        }
+
+        function setStatus(text) {
+            if (stepStatus) {
+                stepStatus.textContent = text;
+            }
+        }
+
+        function stopAutoSort() {
+            if (autoTimer) {
+                clearInterval(autoTimer);
+                autoTimer = null;
+            }
+        }
+
+        function resetStepSort() {
+            stopAutoSort();
+            stepState = null;
+            outputDiv.innerHTML = "Bấm nút để xem kết quả chi tiết từng bước...";
+            setStatus("Sẵn sàng. Nhấn \"Bước tiếp theo\" để bắt đầu.");
+            updatePreview();
+        }
+
+        function ensureStepState() {
+            if (stepState) {
+                return stepState;
+            }
+
+            const arr = parseInput();
+            if (arr.length === 0) {
+                outputDiv.innerHTML = `
+                <div class="log-step">
+                    <div class="log-title">Thiếu dữ liệu</div>
+                    <div>Vui lòng nhập mảng hợp lệ.</div>
+                </div>`;
+                setStatus("Thiếu dữ liệu. Hãy nhập mảng hợp lệ.");
+                return null;
+            }
+
+            stepState = {
+                arr,
+                i: 0,
+                logParts: [
+                    `
+                <div class="log-step">
+                    <div class="log-title">Mảng ban đầu</div>
+                    <div class="log-array">${formatArray(arr)}</div>
+                </div>`
+                ],
+                done: false
+            };
+
+            outputDiv.innerHTML = stepState.logParts.join("");
+            arrayView.innerHTML = formatArray(arr);
+            setStatus(`Bắt đầu: ${arr.length} phần tử. Nhấn "Bước tiếp theo".`);
+            return stepState;
+        }
+
+        function finalizeStepSort(state) {
+            if (!state || state.done) {
+                return;
+            }
+            state.logParts.push(`
+            <div class="log-step">
+                <div class="log-title">Hoàn tất</div>
+                <div class="highlight">Kết quả: [${state.arr.join(", ")}]</div>
+            </div>`);
+            outputDiv.innerHTML = state.logParts.join("");
+            arrayView.innerHTML = formatArray(state.arr, { sortedUntil: state.arr.length - 1 });
+            state.done = true;
+            setStatus("Hoàn tất. Bạn có thể nhấn \"Đặt lại\" để chạy lại.");
+        }
+
+        function stepSelectionSort() {
+            stopAutoSort();
+            const state = ensureStepState();
+            if (!state) {
+                return;
+            }
+
+            if (state.done) {
+                setStatus("Đã hoàn tất. Nhấn \"Đặt lại\" để chạy lại.");
+                return;
+            }
+
+            if (state.i >= state.arr.length - 1) {
+                finalizeStepSort(state);
+                return;
+            }
+
+            const i = state.i;
+            let minIndex = i;
+            for (let j = i + 1; j < state.arr.length; j++) {
+                if (state.arr[j] < state.arr[minIndex]) {
+                    minIndex = j;
+                }
+            }
+
+            const minVal = state.arr[minIndex];
+            const currentVal = state.arr[i];
+
+            let stepLog = `<div class="log-step">`;
+            stepLog += `<div class="log-title">Bước ${i + 1}</div>`;
+            stepLog += `<div>Quét phần chưa sắp xếp để tìm min.</div>`;
+            stepLog += `<div>Min = <span class="log-min">${minVal}</span> tại vị trí ${minIndex}.</div>`;
+
+            if (minIndex !== i) {
+                stepLog += `<div>Hoán đổi ${currentVal} (vị trí ${i}) với ${minVal} (vị trí ${minIndex}).</div>`;
+                const temp = state.arr[i];
+                state.arr[i] = state.arr[minIndex];
+                state.arr[minIndex] = temp;
+            } else {
+                stepLog += `<div><span class="log-ok">Không cần đổi chỗ</span> vì phần tử đã đúng vị trí.</div>`;
+            }
+
+            stepLog += `<div class="log-array">${formatArray(state.arr, { sortedUntil: i, currentIndex: i, minIndex: i })}</div>`;
+            stepLog += `</div>`;
+
+            state.logParts.push(stepLog);
+            outputDiv.innerHTML = state.logParts.join("");
+            arrayView.innerHTML = formatArray(state.arr, { sortedUntil: i, currentIndex: i, minIndex: i });
+            state.i += 1;
+            setStatus(`Đã xong bước ${state.i}/${state.arr.length - 1}.`);
+
+            if (state.i >= state.arr.length - 1) {
+                finalizeStepSort(state);
+            }
+        }
+
+        function autoSelectionSort() {
+            const state = ensureStepState();
+            if (!state || state.done) {
+                return;
+            }
+            if (autoTimer) {
+                return;
+            }
+            setStatus("Đang chạy tự động...");
+            autoTimer = setInterval(() => {
+                if (!stepState || stepState.done) {
+                    stopAutoSort();
+                    return;
+                }
+                stepSelectionSort();
+            }, 900);
+        }
+
+        function runSelectionSort() {
+            stopAutoSort();
+            stepState = null;
+            const arr = parseInput();
+            if (arr.length === 0) {
+                outputDiv.innerHTML = `
+                <div class="log-step">
+                    <div class="log-title">Thiếu dữ liệu</div>
+                    <div>Vui lòng nhập mảng hợp lệ.</div>
+                </div>`;
+                setStatus("Thiếu dữ liệu. Hãy nhập mảng hợp lệ.");
+                return;
+            }
+
+            let log = `
+            <div class="log-step">
+                <div class="log-title">Mảng ban đầu</div>
+                <div class="log-array">${formatArray(arr)}</div>
+            </div>`;
+
+            const n = arr.length;
+
+            for (let i = 0; i < n - 1; i++) {
+                let minIndex = i;
+                for (let j = i + 1; j < n; j++) {
+                    if (arr[j] < arr[minIndex]) {
+                        minIndex = j;
+                    }
+                }
+
+                const minVal = arr[minIndex];
+                const currentVal = arr[i];
+
+                log += `<div class="log-step">`;
+                log += `<div class="log-title">Bước ${i + 1}</div>`;
+                log += `<div>Quét phần chưa sắp xếp để tìm min.</div>`;
+                log += `<div>Min = <span class="log-min">${minVal}</span> tại vị trí ${minIndex}.</div>`;
+
+                if (minIndex !== i) {
+                    log += `<div>Hoán đổi ${currentVal} (vị trí ${i}) với ${minVal} (vị trí ${minIndex}).</div>`;
+                    const temp = arr[i];
+                    arr[i] = arr[minIndex];
+                    arr[minIndex] = temp;
+                } else {
+                    log += `<div><span class="log-ok">Không cần đổi chỗ</span> vì phần tử đã đúng vị trí.</div>`;
+                }
+
+                log += `<div class="log-array">${formatArray(arr, { sortedUntil: i, currentIndex: i, minIndex: i })}</div>`;
+                log += `</div>`;
+            }
+
+            log += `
+            <div class="log-step">
+                <div class="log-title">Hoàn tất</div>
+                <div class="highlight">Kết quả: [${arr.join(", ")}]</div>
+            </div>`;
+
+            outputDiv.innerHTML = log;
+            arrayView.innerHTML = formatArray(arr, { sortedUntil: arr.length - 1 });
+            setStatus("Đã chạy xong toàn bộ. Có thể nhấn \"Đặt lại\" để chạy từng bước.");
+        }
+
+        function generateRandomArray() {
+            stopAutoSort();
+            stepState = null;
+            const length = Math.floor(Math.random() * 6) + 5;
+            const arr = Array.from({ length }, () => Math.floor(Math.random() * 90) + 10);
+            inputEl.value = arr.join(", ");
+            updatePreview();
+            outputDiv.innerHTML = "Bấm nút để xem kết quả chi tiết từng bước...";
+            setStatus("Sẵn sàng. Nhấn \"Bước tiếp theo\" để bắt đầu.");
+        }
+
+        inputEl.addEventListener("input", () => {
+            stopAutoSort();
+            stepState = null;
+            outputDiv.innerHTML = "Bấm nút để xem kết quả chi tiết từng bước...";
+            setStatus("Sẵn sàng. Nhấn \"Bước tiếp theo\" để bắt đầu.");
+            updatePreview();
+        });
+        updatePreview();
+    </script>
+
+</body>
+
+</html>
